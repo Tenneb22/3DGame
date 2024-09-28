@@ -1,16 +1,44 @@
 package de.tenneb22.core;
 
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.system.MemoryStack;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ShaderManager {
 
     private final int programID;
     private int vertexShaderID, fragmentShaderID;
 
+    private final Map<String, Integer> uniforms;
+
     public ShaderManager() throws Exception {
         programID = GL20.glCreateProgram();
         if(programID == 0)
             throw new Exception("Could not create shader");
+
+        uniforms = new HashMap<>();
+    }
+
+    public void createUniform(String uniformName) throws Exception {
+        int uniformLocation = GL20.glGetUniformLocation(programID, uniformName);
+        if(uniformLocation < 0)
+            throw new Exception("Could not find uniform " + uniformName);
+        uniforms.put(uniformName, uniformLocation);
+    }
+
+    public void setUniform(String uniformname, Matrix4f value) {
+        try(MemoryStack stack = MemoryStack.stackPush()) {
+            GL20.glUniformMatrix4fv(uniforms.get(uniformname), false,
+                    value.get(stack.mallocFloat(16)));
+
+        }
+    }
+
+    public void setUniform(String uniformname, int value) {
+        GL20.glUniform1i(uniforms.get(uniformname), value);
     }
 
     public void createVertexShader(String shaderCoder) throws Exception {
