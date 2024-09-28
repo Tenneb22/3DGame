@@ -4,13 +4,13 @@ import de.tenneb22.core.*;
 import de.tenneb22.core.entity.Entity;
 import de.tenneb22.core.entity.Model;
 import de.tenneb22.core.entity.Texture;
+import de.tenneb22.core.utils.Consts;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 public class TestGame implements ILogic {
-
-    private static final float CAMERA_MOVE_SPEED = 0.05f;
 
     private final RenderManager renderer;
     private final ObjectLoader loader;
@@ -23,7 +23,7 @@ public class TestGame implements ILogic {
 
     public TestGame() {
         renderer = new RenderManager();
-        window = Launcher.getWindow();
+        window = Main.getWindow();
         loader = new ObjectLoader();
         camera = new Camera();
         cameraInc = new Vector3f(0,0,0);
@@ -110,8 +110,13 @@ public class TestGame implements ILogic {
     }
 
     @Override
-    public void update() {
-        camera.movePosition(cameraInc.x * CAMERA_MOVE_SPEED, cameraInc.y * CAMERA_MOVE_SPEED, cameraInc.z * CAMERA_MOVE_SPEED);
+    public void update(MouseInput mouseInput) {
+        camera.movePosition(cameraInc.x * Consts.CAMERA_STEP, cameraInc.y * Consts.CAMERA_STEP, cameraInc.z * Consts.CAMERA_STEP);
+
+        if(mouseInput.isRightButtonPress()) {
+            Vector2f rotVec = mouseInput.getDisplVec();
+            camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
+        }
 
         entity.incRotation(0.0f, 0.5f, 0.0f);
     }

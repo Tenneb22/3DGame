@@ -8,11 +8,11 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 
+import static de.tenneb22.core.utils.Consts.*;
+
 public class WindowManager {
 
-    public static final float FOV = (float) Math.toRadians(60.0f);
-    public static final float Z_NEAR = 0.01f;
-    public static final float Z_FAR = 1000.0f;
+
 
     private final String title;
 
@@ -142,7 +142,7 @@ public class WindowManager {
         return height;
     }
 
-    public long getWindow() {
+    public long getWindowHandler() {
         return window;
     }
 

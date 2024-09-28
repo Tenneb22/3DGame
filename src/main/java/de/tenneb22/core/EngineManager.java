@@ -1,7 +1,7 @@
 package de.tenneb22.core;
 
 import de.tenneb22.core.utils.Consts;
-import de.tenneb22.test.Launcher;
+import de.tenneb22.test.Main;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
@@ -16,15 +16,19 @@ public class EngineManager {
     private boolean isRunning;
 
     private WindowManager window;
+    private MouseInput mouseInput;
     private GLFWErrorCallback errorCallback;
     private ILogic gameLogic;
 
     private void init() throws Exception {
         GLFW.glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-        window = Launcher.getWindow();
-        gameLogic = Launcher.getGame();
+
+        window = Main.getWindow();
+        gameLogic = Main.getGame();
+        mouseInput = new MouseInput();
         window.init();
         gameLogic.init();
+        mouseInput.init();
     }
 
     public void start() throws Exception {
@@ -87,6 +91,7 @@ public class EngineManager {
     }
 
     private void input() {
+        mouseInput.input();
         gameLogic.input();
     }
 
@@ -96,7 +101,7 @@ public class EngineManager {
     }
 
     private void update() {
-        gameLogic.update();
+        gameLogic.update(mouseInput);
     }
 
     private void cleanup() {

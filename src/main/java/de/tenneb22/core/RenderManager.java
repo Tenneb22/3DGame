@@ -1,10 +1,9 @@
 package de.tenneb22.core;
 
 import de.tenneb22.core.entity.Entity;
-import de.tenneb22.core.entity.Model;
 import de.tenneb22.core.utils.Transformation;
 import de.tenneb22.core.utils.Utils;
-import de.tenneb22.test.Launcher;
+import de.tenneb22.test.Main;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -16,7 +15,7 @@ public class RenderManager {
     private ShaderManager shader;
 
     public RenderManager() {
-        window = Launcher.getWindow();
+        window = Main.getWindow();
     }
 
     public void init() throws Exception {

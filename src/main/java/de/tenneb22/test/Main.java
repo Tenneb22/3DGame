@@ -5,7 +5,7 @@ import de.tenneb22.core.WindowManager;
 import de.tenneb22.core.utils.Consts;
 import org.lwjgl.Version;
 
-public class Launcher {
+public class Main {
 
     private static WindowManager window;
     private static TestGame game;
