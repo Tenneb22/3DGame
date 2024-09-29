@@ -1,10 +1,7 @@
 package de.tenneb22.test;
 
 import de.tenneb22.core.*;
-import de.tenneb22.core.entity.Entity;
-import de.tenneb22.core.entity.Material;
-import de.tenneb22.core.entity.Model;
-import de.tenneb22.core.entity.Texture;
+import de.tenneb22.core.entity.*;
 import de.tenneb22.core.entity.terrain.Terrain;
 import de.tenneb22.core.lighting.DirectionalLight;
 import de.tenneb22.core.lighting.PointLight;
@@ -22,19 +19,11 @@ import java.util.Random;
 public class TestGame implements ILogic {
 
     private final RenderManager renderer;
-    private final ObjectLoader loader;
     private final WindowManager window;
-
-    private List<Entity> entities;
-    private List<Terrain> terrains;
+    private final ObjectLoader loader;
+    private SceneManager sceneManager;
     private Camera camera;
-
     Vector3f cameraInc;
-
-    private float lightAngle, spotAngle = 0, spotInc = 1;
-    private DirectionalLight directionalLight;
-    private PointLight[] pointLights;
-    private SpotLight[] spotLights;
 
     public TestGame() {
         renderer = new RenderManager();
@@ -42,7 +31,7 @@ public class TestGame implements ILogic {
         loader = new ObjectLoader();
         camera = new Camera();
         cameraInc = new Vector3f(0,0,0);
-        lightAngle = -90;
+        sceneManager = new SceneManager(-90);
     }
 
     @Override
@@ -52,21 +41,20 @@ public class TestGame implements ILogic {
         Model model = loader.loadOBJModel("/models/cube1.obj");
         model.setTexture(new Texture(loader.loadTexture("textures/blue.png")), 1f);
 
-        terrains = new ArrayList<>();
-        Terrain terrain = new Terrain(new Vector3f(0, -1, -800), loader, new Material(new Texture(loader.loadTexture("textures/grassblock.png")), 0.1f));
-        Terrain terrain2 = new Terrain(new Vector3f(-800, -1, -800), loader, new Material(new Texture(loader.loadTexture("textures/blue.png")), 0.1f));
-        terrains.add(terrain); terrains.add(terrain2);
+        Terrain terrain = new Terrain(new Vector3f(0, 1, -800), loader, new Material(new Texture(loader.loadTexture("textures/grassblock.png")), 0.1f));
+        Terrain terrain2 = new Terrain(new Vector3f(-800, 1, -800), loader, new Material(new Texture(loader.loadTexture("textures/blue.png")), 0.1f));
+        sceneManager.addTerrain(terrain);
+        sceneManager.addTerrain(terrain2);
 
-        entities = new ArrayList<>();
         Random rnd = new Random();
         for(int i = 0; i < 200; i++) {
-            float x = rnd.nextFloat() * 100 - 50;
-            float y = rnd.nextFloat() * 100 - 50;
-            float z = rnd.nextFloat() * -300;
-            entities.add(new Entity(model, new Vector3f(x,y,z),
-                    new Vector3f(rnd.nextFloat() * 100, rnd.nextFloat() * 180, 0), 1));
+            float x = rnd.nextFloat() * 800;
+            float z = rnd.nextFloat() * -800;
+            sceneManager.addEntity(new Entity(model, new Vector3f(x,2,z),
+                    new Vector3f(0,0,0), 1));
         }
-        entities.add(new Entity(model, new Vector3f(0,0,-2f), new Vector3f(0,0,0), 1));
+        sceneManager.addEntity(new Entity(model, new Vector3f(0,2,-5),
+                new Vector3f(0,0,0), 1));
 
         float lightIntensity = 1.0f;
         //point light
@@ -75,22 +63,28 @@ public class TestGame implements ILogic {
         PointLight pointLight = new PointLight(lightColor, lightPosition, lightIntensity, 0, 0, 1);
 
         //spot light
-        Vector3f coneDir = new Vector3f(0,0,-1);
+        Vector3f coneDir = new Vector3f(0,-50,-1);
         float cutoff = (float) Math.cos(Math.toRadians(140));
-        SpotLight spotLight = new SpotLight(new PointLight(lightColor, new Vector3f(0,0,-5.6f),
-                lightIntensity, 0,0,0.2f), coneDir, cutoff);
+        lightIntensity = 50000f;
+        SpotLight spotLight = new SpotLight(new PointLight(lightColor, new Vector3f(1f,50f,-5f),
+                lightIntensity, 0,0,0.02f), coneDir, cutoff);
 
-        SpotLight spotLight1 = new SpotLight(new PointLight(lightColor, lightPosition, lightIntensity,
-                0, 0, 1), coneDir, cutoff);
-        spotLight1.getPointLight().setPosition(new Vector3f(0.5f, 0.5f, -5.6f));
+        //spot light
+        coneDir = new Vector3f(0,-50,-1);
+        cutoff = (float) Math.cos(Math.toRadians(140));
+        lightIntensity = 50000f;
+        SpotLight spotLight1 = new SpotLight(new PointLight(lightColor, new Vector3f(1f,50f,-5f),
+                lightIntensity, 0,0,0.02f), coneDir, cutoff);
+
 
         //directional light
-        lightPosition = new Vector3f(-1, -10, 0);
+        lightIntensity = 1f;
+        lightPosition = new Vector3f(-1, 0, 0);
         lightColor = new Vector3f(1,1,1);
-        directionalLight = new DirectionalLight(lightColor, lightPosition, lightIntensity);
+        sceneManager.setDirectionalLight(new DirectionalLight(lightColor, lightPosition, lightIntensity));
 
-        pointLights = new PointLight[]{pointLight};
-        spotLights = new SpotLight[]{spotLight, spotLight1};
+        sceneManager.setPointLights(new PointLight[]{pointLight});
+        sceneManager.setSpotLights(new SpotLight[]{spotLight, spotLight1});
     }
 
     @Override
@@ -110,12 +104,12 @@ public class TestGame implements ILogic {
         if(window.isKeyPressed(GLFW.GLFW_KEY_X))
             cameraInc.y = 1;
 
-        float lightPos = spotLights[0].getPointLight().getPosition().z;
+        float lightPos = sceneManager.getSpotLights()[0].getPointLight().getPosition().z;
         if(window.isKeyPressed(GLFW.GLFW_KEY_N)) {
-            spotLights[0].getPointLight().getPosition().z = lightPos + 0.1f;
+            sceneManager.getSpotLights()[0].getPointLight().getPosition().z = lightPos + 0.1f;
         }
         if(window.isKeyPressed(GLFW.GLFW_KEY_M)) {
-            spotLights[0].getPointLight().getPosition().z = lightPos - 0.1f;
+            sceneManager.getSpotLights()[0].getPointLight().getPosition().z = lightPos - 0.1f;
         }
     }
 
@@ -130,48 +124,52 @@ public class TestGame implements ILogic {
 
         //entity.incRotation(0.0f, 0.25f, 0.0f);
 
-        spotAngle += spotInc * 0.05;
-        if(spotAngle > 4)
-            spotInc = -1;
-        else if (spotAngle <= -4)
-            spotInc = -1;
+        sceneManager.incSpotAngle(0.15f);
 
-        double spotAngleRad = Math.toRadians(spotAngle);
-        Vector3f coneDir = spotLights[0].getPointLight().getPosition();
-        coneDir.y = (float) Math.sin(spotAngleRad);
+        if(sceneManager.getSpotAngle() > 4)
+            sceneManager.setSpotAngle(-1);
+        else if (sceneManager.getSpotAngle() <= -4)
+            sceneManager.setSpotAngle(-1);
 
-        lightAngle += 0.5f;
-        if(lightAngle > 90) {
-            directionalLight.setIntensity(0);
-            if(lightAngle >= 360)
-                lightAngle = -90;
-        } else if (lightAngle <= -80 || lightAngle >= 80) {
-            float factor = 1 - (Math.abs(lightAngle) - 80) / 10.0f;
-            directionalLight.setIntensity(factor);
-            directionalLight.getColor().y = Math.max(factor, 0.9f);
-            directionalLight.getColor().z = Math.max(factor, 0.5f);
+        double spotAngleRad = Math.toRadians(sceneManager.getSpotAngle());
+        Vector3f coneDir = sceneManager.getSpotLights()[0].getPointLight().getPosition();
+        coneDir.x = (float) Math.sin(spotAngleRad);
+
+        coneDir = sceneManager.getSpotLights()[1].getPointLight().getPosition();
+        coneDir.x = (float) Math.cos(spotAngleRad * 0.15);
+
+        sceneManager.incLightAngle(1.1f);
+        if(sceneManager.getLightAngle() > 90) {
+            sceneManager.getDirectionalLight().setIntensity(0);
+            if(sceneManager.getLightAngle() >= 360)
+                sceneManager.setLightAngle(-90);
+        } else if (sceneManager.getLightAngle() <= -80 || sceneManager.getLightAngle() >= 80) {
+            float factor = 1 - (Math.abs(sceneManager.getLightAngle()) - 80) / 10.0f;
+            sceneManager.getDirectionalLight().setIntensity(factor);
+            sceneManager.getDirectionalLight().getColor().y = Math.max(factor, 0.9f);
+            sceneManager.getDirectionalLight().getColor().z = Math.max(factor, 0.5f);
         } else {
-            directionalLight.setIntensity(1);
-            directionalLight.getColor().x = 1;
-            directionalLight.getColor().y = 1;
-            directionalLight.getColor().z = 1;
+            sceneManager.getDirectionalLight().setIntensity(1);
+            sceneManager.getDirectionalLight().getColor().x = 1;
+            sceneManager.getDirectionalLight().getColor().y = 1;
+            sceneManager.getDirectionalLight().getColor().z = 1;
         }
-        double angRad = Math.toRadians(lightAngle);
-        directionalLight.getDirection().x = (float) Math.sin(angRad);
-        directionalLight.getDirection().y = (float) Math.cos(angRad);
+        double angRad = Math.toRadians(sceneManager.getLightAngle());
+        sceneManager.getDirectionalLight().getDirection().x = (float) Math.sin(angRad);
+        sceneManager.getDirectionalLight().getDirection().y = (float) Math.cos(angRad);
 
-        for(Entity entity : entities) {
+        for(Entity entity : sceneManager.getEntities()) {
             renderer.processEntity(entity);
         }
 
-        for(Terrain terrain : terrains) {
+        for(Terrain terrain : sceneManager.getTerrains()) {
             renderer.processTerrain(terrain);
         }
     }
 
     @Override
     public void render() {
-        renderer.render(camera, directionalLight, pointLights, spotLights);
+        renderer.render(camera, sceneManager);
     }
 
     @Override

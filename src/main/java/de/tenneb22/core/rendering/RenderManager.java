@@ -5,6 +5,7 @@ import de.tenneb22.core.ShaderManager;
 import de.tenneb22.core.WindowManager;
 import de.tenneb22.core.entity.Entity;
 import de.tenneb22.core.entity.Model;
+import de.tenneb22.core.entity.SceneManager;
 import de.tenneb22.core.entity.terrain.Terrain;
 import de.tenneb22.core.lighting.DirectionalLight;
 import de.tenneb22.core.lighting.PointLight;
@@ -57,7 +58,7 @@ public class RenderManager {
         shader.setUniform("directionalLight", directionalLight);
     }
 
-    public void render(Camera camera, DirectionalLight directionalLight, PointLight[] pointLights, SpotLight[] spotLights) {
+    public void render(Camera camera, SceneManager scene) {
         clear();
 
         if(window.isResized()) {
@@ -65,8 +66,8 @@ public class RenderManager {
             window.setResize(false);
         }
 
-        entityRenderer.render(camera, pointLights, spotLights, directionalLight);
-        terrainRenderer.render(camera, pointLights, spotLights, directionalLight);
+        entityRenderer.render(camera, scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight());
+        terrainRenderer.render(camera, scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight());
     }
 
     public void processEntity(Entity entity) {
