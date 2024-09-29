@@ -7,11 +7,11 @@ import de.tenneb22.core.entity.Texture;
 import de.tenneb22.core.lighting.DirectionalLight;
 import de.tenneb22.core.lighting.PointLight;
 import de.tenneb22.core.lighting.SpotLight;
+import de.tenneb22.core.rendering.RenderManager;
 import de.tenneb22.core.utils.Consts;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,12 +70,12 @@ public class TestGame implements ILogic {
         //spot light
         Vector3f coneDir = new Vector3f(0,0,-1);
         float cutoff = (float) Math.cos(Math.toRadians(140));
-        SpotLight spotLight = new SpotLight(new PointLight(lightColor, new Vector3f(0,0,-4.6f),
+        SpotLight spotLight = new SpotLight(new PointLight(lightColor, new Vector3f(0,0,-5.6f),
                 lightIntensity, 0,0,0.2f), coneDir, cutoff);
 
         SpotLight spotLight1 = new SpotLight(new PointLight(lightColor, lightPosition, lightIntensity,
                 0, 0, 1), coneDir, cutoff);
-        spotLight1.getPointLight().setPosition(new Vector3f(0.5f, 0.5f, -4.6f));
+        spotLight1.getPointLight().setPosition(new Vector3f(0.5f, 0.5f, -5.6f));
 
         //directional light
         lightPosition = new Vector3f(-1, -10, 0);

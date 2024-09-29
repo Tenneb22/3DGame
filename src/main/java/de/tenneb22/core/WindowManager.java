@@ -126,7 +126,7 @@ public class WindowManager {
         GLFW.glfwSetWindowTitle(window, title);
     }
 
-    public boolean isResize() {
+    public boolean isResized() {
         return resize;
     }
 
