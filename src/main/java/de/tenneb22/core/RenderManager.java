@@ -1,6 +1,7 @@
 package de.tenneb22.core;
 
 import de.tenneb22.core.entity.Entity;
+import de.tenneb22.core.lighting.DirectionalLight;
 import de.tenneb22.core.utils.Consts;
 import de.tenneb22.core.utils.Transformation;
 import de.tenneb22.core.utils.Utils;
@@ -9,6 +10,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+
+import static org.lwjgl.opengl.GL11.glViewport;
 
 public class RenderManager {
 
@@ -30,16 +33,28 @@ public class RenderManager {
         shader.createUniform("viewMatrix");
         shader.createUniform("ambientLight");
         shader.createMaterialUniform("material");
+        shader.createUniform("specularPower");
+        shader.createDirectionalLightUniform("directionalLight");
     }
 
-    public void render(Entity entity, Camera camera) {
+    public void render(Entity entity, Camera camera, DirectionalLight directionalLight) {
+        clear();
+
+        if(window.isResize()) {
+            glViewport(0,0, window.getWidth(), window.getHeight());
+            window.setResize(false);
+        }
+
         shader.bind();
+
         shader.setUniform("textureSampler", 0);
         shader.setUniform("transformationMatrix", Transformation.createTransformationMatrix(entity));
         shader.setUniform("projectionMatrix", window.updateProjectionMatrix());
         shader.setUniform("viewMatrix", Transformation.getViewMatrix(camera));
         shader.setUniform("material", entity.getModel().getMaterial());
         shader.setUniform("ambientLight", Consts.AMBIENT_LIGHT);
+        shader.setUniform("specularPower", Consts.SPECULAR_POWER);
+        shader.setUniform("directionalLight", directionalLight);
 
         GL30.glBindVertexArray(entity.getModel().getId());
         GL20.glEnableVertexAttribArray(0);

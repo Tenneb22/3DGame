@@ -1,6 +1,7 @@
 package de.tenneb22.core;
 
 import de.tenneb22.core.entity.Material;
+import de.tenneb22.core.lighting.DirectionalLight;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -30,6 +31,12 @@ public class ShaderManager {
         if(uniformLocation < 0)
             throw new Exception("Could not find uniform " + uniformName);
         uniforms.put(uniformName, uniformLocation);
+    }
+
+    public void createDirectionalLightUniform(String uniformName) throws Exception {
+        createUniform(uniformName + ".color");
+        createUniform(uniformName + ".direction");
+        createUniform(uniformName + ".intensity");
     }
 
     public void createMaterialUniform(String uniformName) throws Exception {
@@ -77,6 +84,12 @@ public class ShaderManager {
         setUniform(uniformName + ".specular", material.getSpecularColor());
         setUniform(uniformName + ".hasTexture", material.hasTexture() ? 1 : 0);
         setUniform(uniformName + ".reflectance", material.getReflectance());
+    }
+
+    public void setUniform(String uniformName, DirectionalLight directionalLight) {
+        setUniform(uniformName + ".color", directionalLight.getColor());
+        setUniform(uniformName + ".direction", directionalLight.getDirection());
+        setUniform(uniformName + ".intensity", directionalLight.getIntensity());
     }
 
     public void createVertexShader(String shaderCoder) throws Exception {
