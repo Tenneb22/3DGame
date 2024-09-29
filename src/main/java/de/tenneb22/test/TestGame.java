@@ -2,8 +2,10 @@ package de.tenneb22.test;
 
 import de.tenneb22.core.*;
 import de.tenneb22.core.entity.Entity;
+import de.tenneb22.core.entity.Material;
 import de.tenneb22.core.entity.Model;
 import de.tenneb22.core.entity.Texture;
+import de.tenneb22.core.entity.terrain.Terrain;
 import de.tenneb22.core.lighting.DirectionalLight;
 import de.tenneb22.core.lighting.PointLight;
 import de.tenneb22.core.lighting.SpotLight;
@@ -24,6 +26,7 @@ public class TestGame implements ILogic {
     private final WindowManager window;
 
     private List<Entity> entities;
+    private List<Terrain> terrains;
     private Camera camera;
 
     Vector3f cameraInc;
@@ -49,6 +52,10 @@ public class TestGame implements ILogic {
         Model model = loader.loadOBJModel("/models/cube1.obj");
         model.setTexture(new Texture(loader.loadTexture("textures/blue.png")), 1f);
 
+        terrains = new ArrayList<>();
+        Terrain terrain = new Terrain(new Vector3f(0, -1, -800), loader, new Material(new Texture(loader.loadTexture("textures/grassblock.png")), 0.1f));
+        Terrain terrain2 = new Terrain(new Vector3f(-800, -1, -800), loader, new Material(new Texture(loader.loadTexture("textures/blue.png")), 0.1f));
+        terrains.add(terrain); terrains.add(terrain2);
 
         entities = new ArrayList<>();
         Random rnd = new Random();
@@ -155,6 +162,10 @@ public class TestGame implements ILogic {
 
         for(Entity entity : entities) {
             renderer.processEntity(entity);
+        }
+
+        for(Terrain terrain : terrains) {
+            renderer.processTerrain(terrain);
         }
     }
 

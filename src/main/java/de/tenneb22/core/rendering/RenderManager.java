@@ -5,6 +5,7 @@ import de.tenneb22.core.ShaderManager;
 import de.tenneb22.core.WindowManager;
 import de.tenneb22.core.entity.Entity;
 import de.tenneb22.core.entity.Model;
+import de.tenneb22.core.entity.terrain.Terrain;
 import de.tenneb22.core.lighting.DirectionalLight;
 import de.tenneb22.core.lighting.PointLight;
 import de.tenneb22.core.lighting.SpotLight;
@@ -27,6 +28,7 @@ public class RenderManager {
 
     private final WindowManager window;
     private EntityRenderer entityRenderer;
+    private TerrainRenderer terrainRenderer;
 
     public RenderManager() {
         window = Main.getWindow();
@@ -34,8 +36,9 @@ public class RenderManager {
 
     public void init() throws Exception {
         entityRenderer = new EntityRenderer();
-
+        terrainRenderer = new TerrainRenderer();
         entityRenderer.init();
+        terrainRenderer.init();
     }
 
     public static void renderLights(PointLight[] pointLights, SpotLight[] spotLights,
@@ -63,6 +66,7 @@ public class RenderManager {
         }
 
         entityRenderer.render(camera, pointLights, spotLights, directionalLight);
+        terrainRenderer.render(camera, pointLights, spotLights, directionalLight);
     }
 
     public void processEntity(Entity entity) {
@@ -76,11 +80,16 @@ public class RenderManager {
         }
     }
 
+    public void processTerrain(Terrain terrain) {
+        terrainRenderer.getTerrain().add(terrain);
+    }
+
     public void clear() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
     }
 
     public void cleanup() {
         entityRenderer.cleanup();
+        terrainRenderer.cleanup();
     }
 }
