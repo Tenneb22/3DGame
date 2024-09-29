@@ -3,6 +3,7 @@ package de.tenneb22.core;
 import de.tenneb22.core.entity.Material;
 import de.tenneb22.core.lighting.DirectionalLight;
 import de.tenneb22.core.lighting.PointLight;
+import de.tenneb22.core.lighting.SpotLight;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -57,6 +58,12 @@ public class ShaderManager {
         createUniform(uniformName + ".exponent");
     }
 
+    public void createSpotLightUniform(String uniformName) throws Exception {
+        createPointLightUniform(uniformName + ".pl");
+        createUniform(uniformName + ".conedir");
+        createUniform(uniformName + ".cutoff");
+    }
+
     public void setUniform(String uniformName, Matrix4f value) {
         try(MemoryStack stack = MemoryStack.stackPush()) {
             GL20.glUniformMatrix4fv(uniforms.get(uniformName), false,
@@ -109,6 +116,13 @@ public class ShaderManager {
         setUniform(uniformName + ".constant", pointLight.getConstant());
         setUniform(uniformName + ".linear", pointLight.getLinear());
         setUniform(uniformName + ".exponent", pointLight.getExponent());
+    }
+
+    public void setUniform(String uniformName, SpotLight spotLight) {
+        setUniform(uniformName + ".pl", spotLight.getPointLight());
+        setUniform(uniformName + ".conedir", spotLight.getConeDirection());
+        setUniform(uniformName + ".cutoff", spotLight.getCutoff());
+
     }
 
     public void createVertexShader(String shaderCoder) throws Exception {

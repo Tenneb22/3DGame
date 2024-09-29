@@ -6,6 +6,7 @@ import de.tenneb22.core.entity.Model;
 import de.tenneb22.core.entity.Texture;
 import de.tenneb22.core.lighting.DirectionalLight;
 import de.tenneb22.core.lighting.PointLight;
+import de.tenneb22.core.lighting.SpotLight;
 import de.tenneb22.core.utils.Consts;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -26,6 +27,7 @@ public class TestGame implements ILogic {
     private float lightAngle;
     private DirectionalLight directionalLight;
     private PointLight pointLight;
+    private SpotLight spotLight;
 
     public TestGame() {
         renderer = new RenderManager();
@@ -45,10 +47,18 @@ public class TestGame implements ILogic {
         entity = new Entity(model, new Vector3f(0,0,-5), new Vector3f(0,0,0), 1);
 
         float lightIntensity = 1.0f;
+        //point light
         Vector3f lightPosition = new Vector3f(0,0,-3.2f);
         Vector3f lightColor = new Vector3f(1,1,1);
         pointLight = new PointLight(lightColor, lightPosition, lightIntensity);
 
+        //spot light
+        Vector3f coneDir = new Vector3f(0,0,1);
+        float cutoff = (float) Math.cos(Math.toRadians(180));
+        spotLight = new SpotLight(new PointLight(lightColor, new Vector3f(0,0,1f),
+                lightIntensity, 0,0,1), coneDir, cutoff);
+
+        //directional light
         lightPosition = new Vector3f(-1, -10, 0);
         lightColor = new Vector3f(1,1,1);
         directionalLight = new DirectionalLight(lightColor, lightPosition, lightIntensity);
@@ -70,6 +80,14 @@ public class TestGame implements ILogic {
             cameraInc.y = -1;
         if(window.isKeyPressed(GLFW.GLFW_KEY_X))
             cameraInc.y = 1;
+
+        float lightPos = spotLight.getPointLight().getPosition().z;
+        if(window.isKeyPressed(GLFW.GLFW_KEY_N)) {
+            spotLight.getPointLight().getPosition().z = lightPos + 0.1f;
+        }
+        if(window.isKeyPressed(GLFW.GLFW_KEY_M)) {
+            spotLight.getPointLight().getPosition().z = lightPos - 0.1f;
+        }
     }
 
     @Override
@@ -106,7 +124,7 @@ public class TestGame implements ILogic {
 
     @Override
     public void render() {
-        renderer.render(entity, camera, directionalLight, pointLight);
+        renderer.render(entity, camera, directionalLight, pointLight, spotLight);
     }
 
     @Override
