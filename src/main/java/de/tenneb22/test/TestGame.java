@@ -5,6 +5,7 @@ import de.tenneb22.core.entity.Entity;
 import de.tenneb22.core.entity.Model;
 import de.tenneb22.core.entity.Texture;
 import de.tenneb22.core.lighting.DirectionalLight;
+import de.tenneb22.core.lighting.PointLight;
 import de.tenneb22.core.utils.Consts;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -24,6 +25,7 @@ public class TestGame implements ILogic {
 
     private float lightAngle;
     private DirectionalLight directionalLight;
+    private PointLight pointLight;
 
     public TestGame() {
         renderer = new RenderManager();
@@ -42,9 +44,13 @@ public class TestGame implements ILogic {
         model.setTexture(new Texture(loader.loadTexture("textures/blue.png")), 1f);
         entity = new Entity(model, new Vector3f(0,0,-5), new Vector3f(0,0,0), 1);
 
-        float lightIntensity = 0.0f;
-        Vector3f lightPosition = new Vector3f(-1, -10, 0);
+        float lightIntensity = 1.0f;
+        Vector3f lightPosition = new Vector3f(0,0,-3.2f);
         Vector3f lightColor = new Vector3f(1,1,1);
+        pointLight = new PointLight(lightColor, lightPosition, lightIntensity);
+
+        lightPosition = new Vector3f(-1, -10, 0);
+        lightColor = new Vector3f(1,1,1);
         directionalLight = new DirectionalLight(lightColor, lightPosition, lightIntensity);
     }
 
@@ -100,7 +106,7 @@ public class TestGame implements ILogic {
 
     @Override
     public void render() {
-        renderer.render(entity, camera, directionalLight);
+        renderer.render(entity, camera, directionalLight, pointLight);
     }
 
     @Override

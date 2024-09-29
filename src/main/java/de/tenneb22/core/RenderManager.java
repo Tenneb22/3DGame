@@ -2,6 +2,7 @@ package de.tenneb22.core;
 
 import de.tenneb22.core.entity.Entity;
 import de.tenneb22.core.lighting.DirectionalLight;
+import de.tenneb22.core.lighting.PointLight;
 import de.tenneb22.core.utils.Consts;
 import de.tenneb22.core.utils.Transformation;
 import de.tenneb22.core.utils.Utils;
@@ -35,9 +36,10 @@ public class RenderManager {
         shader.createMaterialUniform("material");
         shader.createUniform("specularPower");
         shader.createDirectionalLightUniform("directionalLight");
+        shader.createPointLightUniform("pointLight");
     }
 
-    public void render(Entity entity, Camera camera, DirectionalLight directionalLight) {
+    public void render(Entity entity, Camera camera, DirectionalLight directionalLight, PointLight pointLight) {
         clear();
 
         if(window.isResize()) {
@@ -55,6 +57,7 @@ public class RenderManager {
         shader.setUniform("ambientLight", Consts.AMBIENT_LIGHT);
         shader.setUniform("specularPower", Consts.SPECULAR_POWER);
         shader.setUniform("directionalLight", directionalLight);
+        shader.setUniform("pointLight", pointLight);
 
         GL30.glBindVertexArray(entity.getModel().getId());
         GL20.glEnableVertexAttribArray(0);
@@ -67,6 +70,7 @@ public class RenderManager {
         GL20.glDisableVertexAttribArray(1);
         GL20.glDisableVertexAttribArray(2);
         GL30.glBindVertexArray(0);
+
         shader.unbind();
     }
 
