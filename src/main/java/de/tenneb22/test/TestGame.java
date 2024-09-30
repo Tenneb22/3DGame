@@ -2,9 +2,7 @@ package de.tenneb22.test;
 
 import de.tenneb22.core.*;
 import de.tenneb22.core.entity.*;
-import de.tenneb22.core.entity.terrain.BlendMapTerrain;
 import de.tenneb22.core.entity.terrain.Terrain;
-import de.tenneb22.core.entity.terrain.TerrainTexture;
 import de.tenneb22.core.lighting.DirectionalLight;
 import de.tenneb22.core.lighting.PointLight;
 import de.tenneb22.core.lighting.SpotLight;
@@ -12,10 +10,7 @@ import de.tenneb22.core.rendering.RenderManager;
 import de.tenneb22.core.utils.Consts;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.Random;
 
 public class TestGame implements ILogic {
 
@@ -30,7 +25,7 @@ public class TestGame implements ILogic {
         renderer = new RenderManager();
         window = Main.getWindow();
         loader = new ObjectLoader();
-        camera = new Camera();
+        camera = new Camera(new Vector3f(0,0,0), new Vector3f(0,0,0));
         cameraInc = new Vector3f(0,0,0);
         sceneManager = new SceneManager(-90);
     }
@@ -39,7 +34,7 @@ public class TestGame implements ILogic {
     public void init() throws Exception {
         renderer.init();
 
-        Model model = loader.loadOBJModel("/models/cube1.obj");
+        /*Model model = loader.loadOBJModel("/models/cube.obj");
         model.setTexture(new Texture(loader.loadTexture("textures/blue.png")), 1f);
         model.getMaterial().setDisableCulling(true);
 
@@ -98,7 +93,42 @@ public class TestGame implements ILogic {
         sceneManager.setDirectionalLight(new DirectionalLight(lightColor, lightPosition, lightIntensity));
 
         sceneManager.setPointLights(new PointLight[]{pointLight});
-        sceneManager.setSpotLights(new SpotLight[]{spotLight, spotLight1});
+        sceneManager.setSpotLights(new SpotLight[]{spotLight, spotLight1}); */
+
+        float reflectance = 1f;
+
+        Model mesh = loader.loadOBJModel("/models/cube.obj");
+        Texture texture = new Texture(loader.loadTexture("textures/grassblock.png"));
+        Material material = new Material(texture, reflectance);
+        mesh.setMaterial(material);
+
+        Entity cube = new Entity(mesh, new Vector3f(0,0, -2), new Vector3f(0,0,0), 0.5f);
+        sceneManager.addEntity(cube);
+
+        // Ambient Light
+        sceneManager.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
+
+        // Point Light
+        Vector3f lightPosition = new Vector3f(0,0,1);
+        float lightIntensity = 1.0f;
+        PointLight pointLight = new PointLight(new Vector3f(1,1,1), lightPosition, lightIntensity);
+        PointLight.Attenuation attenuation = new PointLight.Attenuation(0.0f,0.0f,1.0f);
+        pointLight.setAttenuation(attenuation);
+        sceneManager.setPointLights(new PointLight[]{pointLight});
+
+        // Spot Light
+        lightPosition = new Vector3f(0, 0.0f, 10f);
+        pointLight = new PointLight(new Vector3f(1,1,1), lightPosition, lightIntensity);
+        attenuation = new PointLight.Attenuation(0,0,0.02f);
+        pointLight.setAttenuation(attenuation);
+        Vector3f coneDir = new Vector3f(0,0,-1);
+        float cutoff = (float) Math.cos(Math.toRadians(140));
+        SpotLight spotLight = new SpotLight(pointLight, coneDir, cutoff);
+        sceneManager.setSpotLights(new SpotLight[]{spotLight, new SpotLight(spotLight)});
+
+        // Directional Light
+        lightPosition = new Vector3f(-1, 0, 0);
+        sceneManager.setDirectionalLight(new DirectionalLight(new Vector3f(1,1,1), lightPosition, lightIntensity));
     }
 
     @Override
@@ -136,22 +166,23 @@ public class TestGame implements ILogic {
             camera.moveRotation(rotVec.x * Consts.MOUSE_SENSITIVITY, rotVec.y * Consts.MOUSE_SENSITIVITY, 0);
         }
 
-        //entity.incRotation(0.0f, 0.25f, 0.0f);
+        sceneManager.incSpotAngle(sceneManager.getSpotInc() * 0.05f);
 
-        sceneManager.incSpotAngle(0.15f);
-
-        if(sceneManager.getSpotAngle() > 4)
+        if(sceneManager.getSpotAngle() > 9600)
             sceneManager.setSpotAngle(-1);
-        else if (sceneManager.getSpotAngle() <= -4)
-            sceneManager.setSpotAngle(-1);
+        else if (sceneManager.getSpotAngle() <= -9600)
+            sceneManager.setSpotAngle(1);
 
         double spotAngleRad = Math.toRadians(sceneManager.getSpotAngle());
-        Vector3f coneDir = sceneManager.getSpotLights()[0].getPointLight().getPosition();
-        coneDir.x = (float) Math.sin(spotAngleRad);
+        Vector3f coneDir = sceneManager.getSpotLights()[0].getConeDirection();
+        coneDir.y = (float) Math.sin(spotAngleRad);
 
-        coneDir = sceneManager.getSpotLights()[1].getPointLight().getPosition();
-        coneDir.x = (float) Math.cos(spotAngleRad * 0.15);
+        float factor = 1 - (Math.abs(sceneManager.getLightAngle() - 80) / 10.0f);
+        sceneManager.getDirectionalLight().setIntensity(factor);
+        sceneManager.getDirectionalLight().getColor().y = Math.max(factor, 0.9f);
+        sceneManager.getDirectionalLight().getColor().z = Math.max(factor, 0.5f);
 
+        /*
         sceneManager.incLightAngle(1.1f);
         if(sceneManager.getLightAngle() > 90) {
             sceneManager.getDirectionalLight().setIntensity(0);
@@ -171,6 +202,7 @@ public class TestGame implements ILogic {
         double angRad = Math.toRadians(sceneManager.getLightAngle());
         sceneManager.getDirectionalLight().getDirection().x = (float) Math.sin(angRad);
         sceneManager.getDirectionalLight().getDirection().y = (float) Math.cos(angRad);
+         */
 
         for(Entity entity : sceneManager.getEntities()) {
             renderer.processEntity(entity);

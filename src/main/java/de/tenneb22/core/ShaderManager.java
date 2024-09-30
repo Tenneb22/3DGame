@@ -53,9 +53,9 @@ public class ShaderManager {
         createUniform(uniformName + ".color");
         createUniform(uniformName + ".position");
         createUniform(uniformName + ".intensity");
-        createUniform(uniformName + ".constant");
-        createUniform(uniformName + ".linear");
-        createUniform(uniformName + ".exponent");
+        createUniform(uniformName + ".att.constant");
+        createUniform(uniformName + ".att.linear");
+        createUniform(uniformName + ".att.exponent");
     }
 
     public void createPointLightListUniform(String uniformName, int size) throws Exception {
@@ -125,9 +125,9 @@ public class ShaderManager {
         setUniform(uniformName + ".color", pointLight.getColor());
         setUniform(uniformName + ".position", pointLight.getPosition());
         setUniform(uniformName + ".intensity", pointLight.getIntensity());
-        setUniform(uniformName + ".constant", pointLight.getConstant());
-        setUniform(uniformName + ".linear", pointLight.getLinear());
-        setUniform(uniformName + ".exponent", pointLight.getExponent());
+        setUniform(uniformName + ".att.constant", pointLight.getAttenuation().getConstant());
+        setUniform(uniformName + ".att.linear", pointLight.getAttenuation().getLinear());
+        setUniform(uniformName + ".att.exponent", pointLight.getAttenuation().getExponent());
     }
 
     public void setUniform(String uniformName, SpotLight spotLight) {
