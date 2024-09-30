@@ -2,7 +2,9 @@ package de.tenneb22.test;
 
 import de.tenneb22.core.*;
 import de.tenneb22.core.entity.*;
+import de.tenneb22.core.entity.terrain.BlendMapTerrain;
 import de.tenneb22.core.entity.terrain.Terrain;
+import de.tenneb22.core.entity.terrain.TerrainTexture;
 import de.tenneb22.core.lighting.DirectionalLight;
 import de.tenneb22.core.lighting.PointLight;
 import de.tenneb22.core.lighting.SpotLight;
@@ -10,10 +12,9 @@ import de.tenneb22.core.rendering.RenderManager;
 import de.tenneb22.core.utils.Consts;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 public class TestGame implements ILogic {
@@ -41,8 +42,20 @@ public class TestGame implements ILogic {
         Model model = loader.loadOBJModel("/models/cube1.obj");
         model.setTexture(new Texture(loader.loadTexture("textures/blue.png")), 1f);
 
-        Terrain terrain = new Terrain(new Vector3f(0, 1, -800), loader, new Material(new Texture(loader.loadTexture("textures/grassblock.png")), 0.1f));
-        Terrain terrain2 = new Terrain(new Vector3f(-800, 1, -800), loader, new Material(new Texture(loader.loadTexture("textures/blue.png")), 0.1f));
+        TerrainTexture background = new TerrainTexture(loader.loadTexture("textures/terrain.png"));
+        TerrainTexture redTexture = new TerrainTexture(loader.loadTexture("textures/flowers.png"));
+        TerrainTexture greenTexture = new TerrainTexture(loader.loadTexture("textures/stone.png"));
+        TerrainTexture blueTexture = new TerrainTexture(loader.loadTexture("textures/dirt.png"));
+        TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("textures/blendMap.png"));
+
+        BlendMapTerrain blendMapTerrain = new BlendMapTerrain(background, redTexture, greenTexture, blueTexture);
+
+
+
+        Terrain terrain = new Terrain(new Vector3f(0, 1, -800), loader, new Material(
+                new Vector4f(0.0f, 0.0f, 0.0f, 0.0f), 0.1f), blendMapTerrain, blendMap);
+        Terrain terrain2 = new Terrain(new Vector3f(-800, 1, -800), loader, new Material(
+                new Vector4f(0.0f, 0.0f, 0.0f, 0.0f), 0.1f), blendMapTerrain, blendMap);
         sceneManager.addTerrain(terrain);
         sceneManager.addTerrain(terrain2);
 
@@ -67,7 +80,7 @@ public class TestGame implements ILogic {
         float cutoff = (float) Math.cos(Math.toRadians(140));
         lightIntensity = 50000f;
         SpotLight spotLight = new SpotLight(new PointLight(lightColor, new Vector3f(1f,50f,-5f),
-                lightIntensity, 0,0,0.02f), coneDir, cutoff);
+                lightIntensity, 0,0,0.2f), coneDir, cutoff);
 
         //spot light
         coneDir = new Vector3f(0,-50,-1);
