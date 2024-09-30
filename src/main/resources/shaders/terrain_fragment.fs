@@ -17,6 +17,12 @@ struct Material {
     float reflectance;
 };
 
+struct Attenuation {
+    float constant;
+    float linear;
+    float exponent;
+};
+
 struct DirectionalLight {
     vec3 color;
     vec3 direction;
@@ -27,9 +33,7 @@ struct PointLight {
     vec3 color;
     vec3 position;
     float intensity;
-    float constant;
-    float linear;
-    float exponent;
+    Attenuation att;
 };
 
 struct SpotLight {
@@ -102,7 +106,7 @@ vec4 calcPointLight(PointLight light, vec3 position, vec3 normal) {
 
     //attenuation
     float distance = length(light_dir);
-    float attenuationInv = light.constant + light.linear * distance + light.exponent * distance * distance;
+    float attenuationInv = light.att.constant + light.att.linear * distance + light.att.exponent * distance * distance;
     return light_color / attenuationInv;
 }
 
@@ -116,7 +120,7 @@ vec4 calcSpotLight(SpotLight light, vec3 position, vec3 normal) {
 
     if(spot_alfa > light.cutoff) {
         color = calcPointLight(light.pl, position, normal);
-        color += (1.0 - (1.0 - spot_alfa) / (1.0 - light.cutoff));
+        color *= (1.0 - (1.0 - spot_alfa) / (1.0 - light.cutoff));
     }
 
     return color;

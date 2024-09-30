@@ -2,7 +2,7 @@
 
 in vec3 position;
 in vec2 textureCoord;
-in vec3 normal;
+in vec3 vertexNormal;
 
 out vec2 fragTextureCoord;
 out vec3 fragNormal;
@@ -16,7 +16,7 @@ void main() {
     vec4 worldPos = transformationMatrix * vec4(position, 1.0);
     gl_Position = projectionMatrix * viewMatrix * worldPos;
 
-    fragNormal = normalize(worldPos).xyz;
+    fragNormal = normalize(transformationMatrix * vec4(vertexNormal, 0.0)).xyz;
     fragPos = worldPos.xyz;
     fragTextureCoord = textureCoord;
 }
