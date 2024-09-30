@@ -23,13 +23,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL11.*;
 
 public class RenderManager {
 
     private final WindowManager window;
     private EntityRenderer entityRenderer;
     private TerrainRenderer terrainRenderer;
+
+    private static boolean isCulling = false;
 
     public RenderManager() {
         window = Main.getWindow();
@@ -68,6 +70,21 @@ public class RenderManager {
 
         entityRenderer.render(camera, scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight());
         terrainRenderer.render(camera, scene.getPointLights(), scene.getSpotLights(), scene.getDirectionalLight());
+    }
+
+    public static void enableCulling() {
+        if(!isCulling) {
+            GL11.glEnable(GL_CULL_FACE);
+            GL11.glCullFace(GL_BACK);
+            isCulling = true;
+        }
+    }
+
+    public static void disableCulling() {
+        if(isCulling) {
+            GL11.glDisable(GL_CULL_FACE);
+            isCulling = false;
+        }
     }
 
     public void processEntity(Entity entity) {

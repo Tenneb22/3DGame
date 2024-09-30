@@ -41,6 +41,7 @@ public class TestGame implements ILogic {
 
         Model model = loader.loadOBJModel("/models/cube1.obj");
         model.setTexture(new Texture(loader.loadTexture("textures/blue.png")), 1f);
+        model.getMaterial().setDisableCulling(true);
 
         TerrainTexture background = new TerrainTexture(loader.loadTexture("textures/terrain.png"));
         TerrainTexture redTexture = new TerrainTexture(loader.loadTexture("textures/flowers.png"));
