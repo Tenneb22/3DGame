@@ -27,7 +27,7 @@ public class TestGame implements ILogic {
         loader = new ObjectLoader();
         camera = new Camera(new Vector3f(0,0,0), new Vector3f(0,0,0));
         cameraInc = new Vector3f(0,0,0);
-        sceneManager = new SceneManager(-90);
+        sceneManager = new SceneManager(80);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class TestGame implements ILogic {
         float reflectance = 1f;
 
         Model mesh = loader.loadOBJModel("/models/cube.obj");
-        Texture texture = new Texture(loader.loadTexture("textures/grassblock.png"));
+        Texture texture = new Texture(loader.loadTexture("textures/blue.png"));
         Material material = new Material(texture, reflectance);
         mesh.setMaterial(material);
 
